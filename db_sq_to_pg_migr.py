@@ -56,8 +56,7 @@ with psycopg2.connect(**PG_CONECT) as conn, conn.cursor() as cursor:
         cursor.execute("""TRUNCATE content.person""")
         cursor.execute("""TRUNCATE content.film_work""")
 
-   
-    for i in range(N, len(genre), N):
+    for i in range(0, len(genre), N):
         args = ','.join(item.tupl_str() for item in genre[i: i+N])
         cursor.execute(f"""
         INSERT INTO content.genre (id, name, description)
@@ -67,7 +66,7 @@ with psycopg2.connect(**PG_CONECT) as conn, conn.cursor() as cursor:
         description=EXCLUDED.description
         """)
 
-    for i in range(N, len(genre_fw), N):
+    for i in range(0, len(genre_fw), N):
         args = ','.join(item.tupl_str() for item in genre_fw[i: i+N])
         cursor.execute(f"""
         INSERT INTO content.genre_film_work (id, film_work_id,
@@ -79,7 +78,7 @@ with psycopg2.connect(**PG_CONECT) as conn, conn.cursor() as cursor:
         created=EXCLUDED.created
         """)
 
-    for i in range(N, len(person_fw), N):
+    for i in range(0, len(person_fw), N):
         args = ','.join(item.tupl_str() for item in person_fw[i: i+N])
         cursor.execute(f"""
         INSERT INTO content.person_film_work (id, film_work_id,
@@ -92,7 +91,7 @@ with psycopg2.connect(**PG_CONECT) as conn, conn.cursor() as cursor:
         created=EXCLUDED.created
         """)
 
-    for i in range(N, len(person), N):
+    for i in range(0, len(person), N):
         args = ','.join(item.tupl_str() for item in person[i: i+N])
         cursor.execute(f"""
         INSERT INTO content.person (id, full_name, gender)
@@ -102,17 +101,14 @@ with psycopg2.connect(**PG_CONECT) as conn, conn.cursor() as cursor:
         gender=EXCLUDED.gender
         """)
 
-
-    for i in range(N, len(film_w), N):
+    for i in range(0, len(film_w), N):
         args = ','.join(cursor.mogrify("(%s, %s ,%s ,%s, %s)", item.tupl()).decode() for item in film_w[i: i+N])
         cursor.execute(f"""
-        INSERT INTO content.film_work (id, title, description,type, rating)
+        INSERT INTO content.film_work (id, title, description, type, rating)
         VALUES {args}
         ON CONFLICT (id) DO UPDATE SET
         title=EXCLUDED.title,
         description=EXCLUDED.description,
         rating=EXCLUDED.rating,
-        type=EXCLUDED.type,
-        creation_date=EXCLUDED.creation_date,
+        type=EXCLUDED.type
         """)
-
